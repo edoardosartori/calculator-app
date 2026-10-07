@@ -7,65 +7,76 @@ import 'package:flutter/services.dart';
 import 'core/theme/fusion_tokens.dart';
 import 'core/theme/fusion_theme.dart';
 import 'core/theme/token_loader.dart';
-// import 'features/.../presentation/pages/name_page.dart';
+import 'features/calculator_app/presentation/pages/calculator_page.dart';
 
-Future main() async {
+const String _appTitle = 'Calculator App';
+const String _themeModePreferenceKey = 'theme_mode';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  final tokens = await TokenLoader.load();
-  final preferences = await SharedPreferences.getInstance();
-  final savedThemeMode = preferences.getString(_themeModePreferenceKey);
-  final initialThemeMode = switch (savedThemeMode) {
-    'light' => ThemeMode.light,
-    'dark' => ThemeMode.dark,
-    _ => ThemeMode.system,
-  };
+  final FusionTokens tokens = await TokenLoader.load();
+  final SharedPreferences preferences = await SharedPreferences.getInstance();
 
   runApp(
-    MyApp(
+    App(
       tokens: tokens,
       preferences: preferences,
-      initialThemeMode: initialThemeMode,
+      initialPage: const CalculatorPage(),
     ),
   );
 }
 
-const _themeModePreferenceKey = 'theme_mode';
-
-class MyApp extends StatefulWidget {
-  final FusionTokens tokens;
-  final SharedPreferences preferences;
-  final ThemeMode initialThemeMode;
-
-  const MyApp({
+class App extends StatefulWidget {
+  const App({
     super.key,
     required this.tokens,
     required this.preferences,
-    required this.initialThemeMode,
+    required this.initialPage,
   });
 
+  final FusionTokens tokens;
+  final SharedPreferences preferences;
+  final Widget initialPage;
+
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<App> createState() => _AppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _AppState extends State<App> {
   late ThemeMode _themeMode;
 
   @override
   void initState() {
     super.initState();
-    _themeMode = widget.initialThemeMode;
+    _themeMode = _loadThemeMode();
   }
 
-  void _toggleTheme() {
-    final platformBrightness =
+  ThemeMode _loadThemeMode() {
+    final String? savedThemeMode = widget.preferences.getString(
+      _themeModePreferenceKey,
+    );
+
+    return switch (savedThemeMode) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+  }
+
+  bool get _isDarkMode {
+    final Brightness platformBrightness =
         WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    final isDark = _themeMode == ThemeMode.dark ||
+
+    return _themeMode == ThemeMode.dark ||
         (_themeMode == ThemeMode.system &&
             platformBrightness == Brightness.dark);
-    final nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
+  }
+
+  void toggleTheme() {
+    final ThemeMode nextMode = _isDarkMode ? ThemeMode.light : ThemeMode.dark;
 
     setState(() {
       _themeMode = nextMode;
@@ -75,7 +86,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> _saveThemeMode(ThemeMode mode) async {
-    final saved = await widget.preferences.setString(
+    final bool saved = await widget.preferences.setString(
       _themeModePreferenceKey,
       mode.name,
     );
@@ -84,41 +95,39 @@ class _MyAppState extends State<MyApp> {
       FlutterError.reportError(
         FlutterErrorDetails(
           exception: StateError('Could not save the selected theme mode.'),
-          library: 'calc_app',
+          library: _appTitle,
         ),
       );
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final platformBrightness =
-        WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    final isDark = _themeMode == ThemeMode.dark ||
-        (_themeMode == ThemeMode.system &&
-            platformBrightness == Brightness.dark);
+  void _updateSystemUiOverlay() {
+    final Brightness iconBrightness =
+        _isDarkMode ? Brightness.light : Brightness.dark;
 
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        statusBarIconBrightness: iconBrightness,
+        statusBarBrightness: _isDarkMode ? Brightness.dark : Brightness.light,
         systemNavigationBarColor: Colors.transparent,
         systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness:
-            isDark ? Brightness.light : Brightness.dark,
+        systemNavigationBarIconBrightness: iconBrightness,
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _updateSystemUiOverlay();
 
     return MaterialApp(
+      title: _appTitle,
       debugShowCheckedModeBanner: false,
       theme: FusionTheme.light(widget.tokens),
       darkTheme: FusionTheme.dark(widget.tokens),
       themeMode: _themeMode,
-      /* home: namePage(
-        onToggleTheme: _toggleTheme,
-        isDarkMode: isDark,
-      ), */
+      home: widget.initialPage,
     );
   }
 }
