@@ -1,19 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'core/theme/fusion_tokens.dart';
 import 'core/theme/fusion_theme.dart';
+import 'core/theme/fusion_tokens.dart';
 import 'core/theme/token_loader.dart';
 import 'features/calculator_app/presentation/pages/calculator_page.dart';
 
-const String _appTitle = 'Calculator App';
+const String _appTitle = 'Calculator';
 const String _themeModePreferenceKey = 'theme_mode';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
@@ -40,6 +45,9 @@ class App extends StatefulWidget {
   final FusionTokens tokens;
   final SharedPreferences preferences;
   final Widget initialPage;
+
+  static _AppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_AppState>();
 
   @override
   State<App> createState() => _AppState();
