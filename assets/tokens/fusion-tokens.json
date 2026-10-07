@@ -1,0 +1,304 @@
+{
+  "$description": "Design token dello stile Fusion (base Carbon Slate con accent ciano per stato e sicurezza). Formato ispirato a DTCG: \"$value\" e \"$type\"; i riferimenti usano la forma {percorso.del.token}.",
+  "meta": {
+    "name": "Fusion",
+    "version": "0.1.0",
+    "status": "bozza derivata da mockup statici, da validare su dispositivo reale",
+    "units": {
+      "dimension": "dp",
+      "fontSize": "sp",
+      "duration": "ms"
+    },
+    "colorFormat": "#RRGGBB oppure #RRGGBBAA (alpha in coda, stile CSS). Attenzione: Flutter usa ARGB (0xAARRGGBB), quindi va convertito."
+  },
+
+  "primitive": {
+    "color": {
+      "$type": "color",
+      "ink": { "$value": "#07070F" },
+      "white": { "$value": "#FFFFFF" },
+      "slate": {
+        "950": { "$value": "#0D0F12" },
+        "900": { "$value": "#151A20" },
+        "850": { "$value": "#1C232B" },
+        "700": { "$value": "#2A333D" },
+        "400": { "$value": "#8B96A3" },
+        "100": { "$value": "#E8ECF1" }
+      },
+      "paper": {
+        "50": { "$value": "#F4F6F9" },
+        "100": { "$value": "#E8ECF1" },
+        "150": { "$value": "#E1E6EC" },
+        "200": { "$value": "#D5DBE3" },
+        "300": { "$value": "#9AA5B1" },
+        "600": { "$value": "#5B6672" },
+        "950": { "$value": "#12161B" }
+      },
+      "blue": {
+        "500": { "$value": "#5B8CFF" },
+        "700": { "$value": "#2F5BD6" }
+      },
+      "cyan": {
+        "400": { "$value": "#00F0FF" },
+        "700": { "$value": "#007C91" },
+        "100": { "$value": "#D6F4F8" },
+        "400a12": { "$value": "#00F0FF1F" }
+      },
+      "amber": {
+        "400": { "$value": "#F5B544" },
+        "700": { "$value": "#B45F06" }
+      },
+      "red": {
+        "400": { "$value": "#F0566A" },
+        "600": { "$value": "#D33A4F" }
+      },
+      "green": {
+        "400": { "$value": "#3DD68C" },
+        "700": { "$value": "#0B7F72" }
+      }
+    },
+
+    "font": {
+      "family": {
+        "$type": "fontFamily",
+        "sans": { "$value": "Inter" },
+        "mono": { "$value": "JetBrains Mono" }
+      },
+      "weight": {
+        "$type": "number",
+        "regular": { "$value": 400 },
+        "medium": { "$value": 500 }
+      }
+    },
+
+    "radius": {
+      "$type": "number",
+      "sm": { "$value": 8 },
+      "md": { "$value": 12 },
+      "lg": { "$value": 16 },
+      "xl": { "$value": 24 },
+      "pill": { "$value": 999 }
+    },
+
+    "space": {
+      "$type": "number",
+      "xs": { "$value": 4 },
+      "sm": { "$value": 8 },
+      "md": { "$value": 12 },
+      "lg": { "$value": 16 },
+      "xl": { "$value": 20 },
+      "2xl": { "$value": 24 },
+      "3xl": { "$value": 32 }
+    },
+
+    "motion": {
+      "duration": {
+        "$type": "number",
+        "fast": { "$value": 150 },
+        "normal": { "$value": 220 },
+        "slow": { "$value": 400 }
+      },
+      "easing": {
+        "$type": "cubicBezier",
+        "standard": { "$value": [0.2, 0, 0, 1] }
+      }
+    }
+  },
+
+  "typography": {
+    "$description": "Stili di testo. Solo due pesi (400 e 500). I numeri e i dati usano sempre il font mono.",
+    "titleLarge": {
+      "family": "{primitive.font.family.sans}",
+      "size": 22,
+      "weight": "{primitive.font.weight.medium}",
+      "lineHeight": 28
+    },
+    "body": {
+      "family": "{primitive.font.family.sans}",
+      "size": 16,
+      "weight": "{primitive.font.weight.regular}",
+      "lineHeight": 24
+    },
+    "bodySmall": {
+      "family": "{primitive.font.family.sans}",
+      "size": 14,
+      "weight": "{primitive.font.weight.regular}",
+      "lineHeight": 20
+    },
+    "label": {
+      "family": "{primitive.font.family.sans}",
+      "size": 14,
+      "weight": "{primitive.font.weight.medium}",
+      "lineHeight": 20
+    },
+    "caption": {
+      "family": "{primitive.font.family.mono}",
+      "size": 12,
+      "weight": "{primitive.font.weight.regular}",
+      "lineHeight": 16
+    },
+    "dataMedium": {
+      "family": "{primitive.font.family.mono}",
+      "size": 14,
+      "weight": "{primitive.font.weight.regular}",
+      "lineHeight": 20
+    },
+    "dataDisplay": {
+      "family": "{primitive.font.family.mono}",
+      "size": 24,
+      "weight": "{primitive.font.weight.regular}",
+      "lineHeight": 32
+    }
+  },
+
+  "semantic": {
+    "dark": {
+      "$type": "color",
+      "background": { "$value": "{primitive.color.slate.950}" },
+      "surface": { "$value": "{primitive.color.slate.900}" },
+      "surfaceVariant": { "$value": "{primitive.color.slate.850}" },
+      "border": { "$value": "{primitive.color.slate.700}" },
+      "track": { "$value": "{primitive.color.slate.850}" },
+      "textPrimary": { "$value": "{primitive.color.slate.100}" },
+      "textSecondary": { "$value": "{primitive.color.slate.400}" },
+      "action": {
+        "primary": { "$value": "{primitive.color.blue.500}" },
+        "onPrimary": { "$value": "{primitive.color.white}" }
+      },
+      "state": {
+        "active": { "$value": "{primitive.color.cyan.400}" },
+        "onActive": { "$value": "{primitive.color.ink}" },
+        "activeTint": { "$value": "{primitive.color.cyan.400a12}" }
+      },
+      "accent": {
+        "symbol": { "$value": "{primitive.color.amber.400}" }
+      },
+      "feedback": {
+        "danger": { "$value": "{primitive.color.red.400}" },
+        "success": { "$value": "{primitive.color.green.400}" }
+      },
+      "password": {
+        "letter": { "$value": "{primitive.color.slate.100}" },
+        "digit": { "$value": "{primitive.color.blue.500}" },
+        "symbol": { "$value": "{primitive.color.amber.400}" }
+      },
+      "switch": {
+        "offTrack": { "$value": "{primitive.color.slate.850}" },
+        "offKnob": { "$value": "{primitive.color.slate.400}" },
+        "onKnob": { "$value": "{primitive.color.white}" }
+      }
+    },
+    "light": {
+      "$type": "color",
+      "background": { "$value": "{primitive.color.paper.50}" },
+      "surface": { "$value": "{primitive.color.white}" },
+      "surfaceVariant": { "$value": "{primitive.color.paper.100}" },
+      "border": { "$value": "{primitive.color.paper.200}" },
+      "track": { "$value": "{primitive.color.paper.150}" },
+      "textPrimary": { "$value": "{primitive.color.paper.950}" },
+      "textSecondary": { "$value": "{primitive.color.paper.600}" },
+      "action": {
+        "primary": { "$value": "{primitive.color.blue.700}" },
+        "onPrimary": { "$value": "{primitive.color.white}" }
+      },
+      "state": {
+        "active": { "$value": "{primitive.color.cyan.700}" },
+        "onActive": { "$value": "{primitive.color.white}" },
+        "activeTint": { "$value": "{primitive.color.cyan.100}" }
+      },
+      "accent": {
+        "symbol": { "$value": "{primitive.color.amber.700}" }
+      },
+      "feedback": {
+        "danger": { "$value": "{primitive.color.red.600}" },
+        "success": { "$value": "{primitive.color.green.700}" }
+      },
+      "password": {
+        "letter": { "$value": "{primitive.color.paper.950}" },
+        "digit": { "$value": "{primitive.color.blue.700}" },
+        "symbol": { "$value": "{primitive.color.amber.700}" }
+      },
+      "switch": {
+        "offTrack": { "$value": "{primitive.color.paper.150}" },
+        "offKnob": { "$value": "{primitive.color.paper.300}" },
+        "onKnob": { "$value": "{primitive.color.white}" }
+      }
+    }
+  },
+
+  "effect": {
+    "$description": "Il tema scuro usa un alone attorno agli elementi di stato attivo; il tema chiaro usa un alone più tenue e un riempimento tenue (activeTint). Nessun glow vero in chiaro.",
+    "halo": {
+      "width": 6,
+      "opacity": { "dark": 0.18, "light": 0.12 },
+      "color": "{semantic.dark.state.active} | {semantic.light.state.active}"
+    },
+    "elevation": {
+      "dark": "nessuna ombra: la profondità è data dal tono della superficie e da un bordo sottile",
+      "light": "ombra morbida: colore {primitive.color.paper.950} al 8%, blur 12, offset y 2"
+    }
+  },
+
+  "component": {
+    "screen": { "paddingHorizontal": "{primitive.space.xl}" },
+    "card": {
+      "radius": "{primitive.radius.lg}",
+      "borderWidth": 1,
+      "padding": "{primitive.space.lg}"
+    },
+    "button": {
+      "height": 52,
+      "radius": "{primitive.radius.lg}",
+      "gap": "{primitive.space.md}",
+      "primary": {
+        "background": "action.primary",
+        "foreground": "action.onPrimary"
+      },
+      "secondary": {
+        "background": "surfaceVariant",
+        "foreground": "textPrimary",
+        "borderWidth": 1,
+        "borderColor": "border"
+      }
+    },
+    "chip": { "height": 32, "radius": "{primitive.radius.md}" },
+    "badge": {
+      "radius": "{primitive.radius.md}",
+      "background": "state.activeTint",
+      "foreground": "state.active"
+    },
+    "progressSegment": { "height": 6, "radius": 3, "gap": 6 },
+    "switch": {
+      "width": 48,
+      "height": 28,
+      "radius": "{primitive.radius.pill}"
+    },
+    "slider": { "trackHeight": 6, "thumbSize": 24 }
+  },
+
+  "rules": {
+    "cyan": {
+      "meaning": "Attivo, in corso o protetto. Nient'altro.",
+      "allowedFor": [
+        "timer o processo in corso",
+        "indicatore di cifratura o protezione (badge, lucchetto)",
+        "barra o etichetta di robustezza",
+        "stato attivo di una funzione"
+      ],
+      "forbiddenFor": [
+        "pulsanti principali (usano action.primary, il blu)",
+        "link, titoli, bordi generici, icone decorative",
+        "errori o avvisi (usano feedback.danger e accent.symbol)"
+      ],
+      "maxElementsPerScreen": 2,
+      "requireTextOrIconAlongside": true,
+      "test": "Se tolgo il ciano, l'utente perde un'informazione di stato? Se no, l'elemento non va in ciano."
+    },
+    "accessibility": {
+      "minContrastNormalText": 4.5,
+      "minContrastLargeTextAndUi": 3,
+      "note": "I rapporti di contrasto del tema chiaro sono stati calcolati a mano e vanno verificati con un checker prima del rilascio.",
+      "neverRelyOnColorAlone": true
+    }
+  }
+}
