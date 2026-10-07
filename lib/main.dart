@@ -8,28 +8,30 @@ import 'core/theme/fusion_theme.dart';
 import 'core/theme/fusion_tokens.dart';
 import 'core/theme/token_loader.dart';
 import 'features/calculator_app/presentation/pages/calculator_page.dart';
+import 'features/calculator_app/presentation/state/calculator_controller.dart';
 
-const String _appTitle = 'Calculator';
 const String _themeModePreferenceKey = 'theme_mode';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   final FusionTokens tokens = await TokenLoader.load();
   final SharedPreferences preferences = await SharedPreferences.getInstance();
 
+  final String? savedThemeMode = preferences.getString(_themeModePreferenceKey);
+  final ThemeMode initialThemeMode = switch (savedThemeMode) {
+    'light' => ThemeMode.light,
+    'dark' => ThemeMode.dark,
+    _ => ThemeMode.system,
+  };
+
   runApp(
     App(
       tokens: tokens,
       preferences: preferences,
-      initialPage: const CalculatorPage(),
+      initialThemeMode: initialThemeMode,
     ),
   );
 }
@@ -39,14 +41,14 @@ class App extends StatefulWidget {
     super.key,
     required this.tokens,
     required this.preferences,
-    required this.initialPage,
+    required this.initialThemeMode,
   });
 
   final FusionTokens tokens;
   final SharedPreferences preferences;
-  final Widget initialPage;
+  final ThemeMode initialThemeMode;
 
-  static _AppState? of(BuildContext context) =>
+  static State<App>? of(BuildContext context) =>
       context.findAncestorStateOfType<_AppState>();
 
   @override
@@ -55,36 +57,22 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   late ThemeMode _themeMode;
+  late final CalculatorController _calculatorController;
 
   @override
   void initState() {
     super.initState();
-    _themeMode = _loadThemeMode();
+    _themeMode = widget.initialThemeMode;
+    _calculatorController = CalculatorController(widget.preferences);
   }
 
-  ThemeMode _loadThemeMode() {
-    final String? savedThemeMode = widget.preferences.getString(
-      _themeModePreferenceKey,
-    );
-
-    return switch (savedThemeMode) {
-      'light' => ThemeMode.light,
-      'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
-    };
-  }
-
-  bool get _isDarkMode {
+  void _toggleTheme() {
     final Brightness platformBrightness =
         WidgetsBinding.instance.platformDispatcher.platformBrightness;
-
-    return _themeMode == ThemeMode.dark ||
+    final bool isDark = _themeMode == ThemeMode.dark ||
         (_themeMode == ThemeMode.system &&
             platformBrightness == Brightness.dark);
-  }
-
-  void toggleTheme() {
-    final ThemeMode nextMode = _isDarkMode ? ThemeMode.light : ThemeMode.dark;
+    final ThemeMode nextMode = isDark ? ThemeMode.light : ThemeMode.dark;
 
     setState(() {
       _themeMode = nextMode;
@@ -103,39 +91,49 @@ class _AppState extends State<App> {
       FlutterError.reportError(
         FlutterErrorDetails(
           exception: StateError('Could not save the selected theme mode.'),
-          library: _appTitle,
+          library: 'calc app',
         ),
       );
     }
   }
 
-  void _updateSystemUiOverlay() {
-    final Brightness iconBrightness =
-        _isDarkMode ? Brightness.light : Brightness.dark;
-
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: iconBrightness,
-        statusBarBrightness: _isDarkMode ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor: Colors.transparent,
-        systemNavigationBarDividerColor: Colors.transparent,
-        systemNavigationBarIconBrightness: iconBrightness,
-      ),
-    );
+  @override
+  void dispose() {
+    _calculatorController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _updateSystemUiOverlay();
+    final Brightness platformBrightness =
+        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    final bool isDark = _themeMode == ThemeMode.dark ||
+        (_themeMode == ThemeMode.system &&
+            platformBrightness == Brightness.dark);
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
+    );
 
     return MaterialApp(
-      title: _appTitle,
+      title: 'Calc App',
       debugShowCheckedModeBanner: false,
       theme: FusionTheme.light(widget.tokens),
       darkTheme: FusionTheme.dark(widget.tokens),
       themeMode: _themeMode,
-      home: widget.initialPage,
+      home: CalculatorPage(
+        controller: _calculatorController,
+        onThemeToggle: _toggleTheme,
+        isDarkMode: isDark,
+      ),
     );
   }
 }
