@@ -25,7 +25,6 @@ class ScientificPanel extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Handle Bar for Sliding/Toggling
         GestureDetector(
           onTap: onToggle,
           behavior: HitTestBehavior.opaque,
@@ -105,19 +104,15 @@ class ScientificPanel extends StatelessWidget {
                     onTap: () => onToken('tan⁻¹('),
                     category: ButtonCategory.action),
                 CalcButton(
-                    label: '√',
-                    onTap: () => onToken('√('),
-                    category: ButtonCategory.action),
-                CalcButton(
                     label: 'x²',
                     onTap: () => onToken('^2'),
                     category: ButtonCategory.action),
-
-                // Row 3
                 CalcButton(
                     label: 'xʸ',
                     onTap: () => onToken('^'),
                     category: ButtonCategory.action),
+
+                // Row 3
                 CalcButton(
                     label: '1/x',
                     onTap: () => onToken('1/'),
@@ -134,27 +129,9 @@ class ScientificPanel extends StatelessWidget {
                     label: 'π',
                     onTap: () => onToken('π'),
                     category: ButtonCategory.action),
-
-                // Row 4
-                CalcButton(
-                    label: 'e',
-                    onTap: () => onToken('e'),
-                    category: ButtonCategory.action),
-                CalcButton(
-                    label: '(',
-                    onTap: () => onToken('('),
-                    category: ButtonCategory.action),
-                CalcButton(
-                    label: ')',
-                    onTap: () => onToken(')'),
-                    category: ButtonCategory.action),
                 CalcButton(
                     label: 'eˣ',
                     onTap: () => onToken('e^'),
-                    category: ButtonCategory.action),
-                CalcButton(
-                    label: '10ˣ',
-                    onTap: () => onToken('10^'),
                     category: ButtonCategory.action),
               ],
             ),

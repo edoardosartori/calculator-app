@@ -65,7 +65,9 @@ class TopBar extends StatelessWidget {
             label: 'Toggle theme mode',
             child: IconButton(
               icon: Icon(
-                isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                isDarkMode
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
               ),
               color: textPrimary,
               constraints: const BoxConstraints(minWidth: 48, minHeight: 48),

@@ -4,7 +4,7 @@ import '../../../../core/theme/fusion_theme_extension.dart';
 
 enum ButtonCategory { number, operator, action, active }
 
-class CalcButton extends StatelessWidget {
+class CalcButton extends StatefulWidget {
   const CalcButton({
     super.key,
     required this.label,
@@ -15,6 +15,13 @@ class CalcButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final ButtonCategory category;
+
+  @override
+  State<CalcButton> createState() => _CalcButtonState();
+}
+
+class _CalcButtonState extends State<CalcButton> {
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,52 +41,63 @@ class CalcButton extends StatelessWidget {
     Color textColor;
     Border? border;
 
-    switch (category) {
-      case ButtonCategory.number:
-        backgroundColor = surfaceColor;
-        textColor = textPrimary;
-        border = Border.all(color: borderColor, width: 1);
-        break;
-      case ButtonCategory.operator:
-        backgroundColor = surfaceVariant;
-        textColor = bluePrimary;
-        border = Border.all(color: borderColor, width: 1);
-        break;
-      case ButtonCategory.action:
-        backgroundColor = surfaceVariant;
-        textColor = textPrimary;
-        border = Border.all(color: borderColor, width: 1);
-        break;
-      case ButtonCategory.active:
-        backgroundColor = cyanActive;
-        textColor = fusionTheme?.stateOnActive ?? const Color(0xFF07070F);
-        border = null;
-        break;
+    if (_isPressed) {
+      backgroundColor = bluePrimary;
+      textColor = theme.colorScheme.onPrimary;
+      border = null;
+    } else {
+      switch (widget.category) {
+        case ButtonCategory.number:
+          backgroundColor = surfaceColor;
+          textColor = textPrimary;
+          border = Border.all(color: borderColor, width: 1);
+          break;
+        case ButtonCategory.operator:
+        case ButtonCategory.action:
+          backgroundColor = surfaceVariant;
+          textColor = bluePrimary;
+          border = Border.all(color: borderColor, width: 1);
+          break;
+        case ButtonCategory.active:
+          backgroundColor = cyanActive;
+          textColor = fusionTheme?.stateOnActive ?? const Color(0xFF07070F);
+          border = null;
+          break;
+      }
     }
 
     return Semantics(
       button: true,
-      label: label,
-      child: Material(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          onTap: onTap,
+      label: widget.label,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 80),
+        decoration: BoxDecoration(
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
-          child: Container(
-            constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-            decoration: BoxDecoration(
-              border: border,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: textColor,
+          border: border,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            onTap: widget.onTap,
+            onTapDown: (_) => setState(() => _isPressed = true),
+            onTapUp: (_) => setState(() => _isPressed = false),
+            onTapCancel: () => setState(() => _isPressed = false),
+            highlightColor: bluePrimary.withValues(alpha: 0.3),
+            splashColor: bluePrimary.withValues(alpha: 0.2),
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+              alignment: Alignment.center,
+              child: Text(
+                widget.label,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: textColor,
+                ),
               ),
             ),
           ),

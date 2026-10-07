@@ -30,6 +30,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: ValueListenableBuilder<CalculatorState>(
           valueListenable: widget.controller,
@@ -50,7 +51,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -59,14 +60,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         onToggle: widget.controller.toggleScientificPanel,
                         onToken: widget.controller.appendToken,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       BasicKeyboard(
                         onToken: widget.controller.appendToken,
                         onClear: widget.controller.clear,
                         onDelete: widget.controller.deleteLastChar,
                         onEvaluate: widget.controller.evaluate,
                       ),
-                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

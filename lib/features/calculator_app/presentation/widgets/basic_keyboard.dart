@@ -24,12 +24,14 @@ class BasicKeyboard extends StatelessWidget {
       crossAxisCount: 4,
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
-      childAspectRatio: 1.2,
+      childAspectRatio: 1.15,
       children: [
         // Row 1
         CalcButton(label: 'C', onTap: onClear, category: ButtonCategory.action),
         CalcButton(
-            label: '⌫', onTap: onDelete, category: ButtonCategory.action),
+            label: '√',
+            onTap: () => onToken('√('),
+            category: ButtonCategory.action),
         CalcButton(
             label: '%',
             onTap: () => onToken('%'),
@@ -68,9 +70,7 @@ class BasicKeyboard extends StatelessWidget {
 
         // Row 5
         CalcButton(
-            label: '±',
-            onTap: () => onToken('−'),
-            category: ButtonCategory.action),
+            label: '⌫', onTap: onDelete, category: ButtonCategory.action),
         CalcButton(label: '0', onTap: () => onToken('0')),
         CalcButton(label: '.', onTap: () => onToken('.')),
         CalcButton(
