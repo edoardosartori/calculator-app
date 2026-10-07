@@ -1,15 +1,15 @@
 {
-  "$description": "Design token dello stile Fusion (base Carbon Slate con accent ciano per stato e sicurezza). Formato ispirato a DTCG: \"$value\" e \"$type\"; i riferimenti usano la forma {percorso.del.token}.",
+  "$description": "Design tokens of the Fusion style (Carbon Slate base with cyan accent for state and security). DTCG-inspired format: \"$value\" and \"$type\"; references use the {token.path.format}.",
   "meta": {
     "name": "Fusion",
-    "version": "0.1.0",
-    "status": "bozza derivata da mockup statici, da validare su dispositivo reale",
+    "version": "0.1.1",
+    "status": "draft derived from static mockups, to be validated on a real device",
     "units": {
       "dimension": "dp",
       "fontSize": "sp",
       "duration": "ms"
     },
-    "colorFormat": "#RRGGBB oppure #RRGGBBAA (alpha in coda, stile CSS). Attenzione: Flutter usa ARGB (0xAARRGGBB), quindi va convertito."
+    "colorFormat": "#RRGGBB or #RRGGBBAA (alpha at the end, CSS style). Note: Flutter uses ARGB (0xAARRGGBB), so it must be converted."
   },
 
   "primitive": {
@@ -46,7 +46,7 @@
       },
       "amber": {
         "400": { "$value": "#F5B544" },
-        "700": { "$value": "#B45F06" }
+        "700": { "$value": "#A35405" }
       },
       "red": {
         "400": { "$value": "#F0566A" },
@@ -106,7 +106,7 @@
   },
 
   "typography": {
-    "$description": "Stili di testo. Solo due pesi (400 e 500). I numeri e i dati usano sempre il font mono.",
+    "$description": "Text styles. Only two weights (400 and 500). Numbers and data always use the mono font.",
     "titleLarge": {
       "family": "{primitive.font.family.sans}",
       "size": 22,
@@ -227,15 +227,15 @@
   },
 
   "effect": {
-    "$description": "Il tema scuro usa un alone attorno agli elementi di stato attivo; il tema chiaro usa un alone più tenue e un riempimento tenue (activeTint). Nessun glow vero in chiaro.",
+    "$description": "Dark theme uses a halo around active state elements; light theme uses a softer halo and a subtle fill (activeTint). No true glow in light theme.",
     "halo": {
       "width": 6,
       "opacity": { "dark": 0.18, "light": 0.12 },
       "color": "{semantic.dark.state.active} | {semantic.light.state.active}"
     },
     "elevation": {
-      "dark": "nessuna ombra: la profondità è data dal tono della superficie e da un bordo sottile",
-      "light": "ombra morbida: colore {primitive.color.paper.950} al 8%, blur 12, offset y 2"
+      "dark": "no shadow: depth is provided by surface tone and a subtle border",
+      "light": "soft shadow: color {primitive.color.paper.950} at 8%, blur 12, offset y 2"
     }
   },
 
@@ -278,26 +278,39 @@
 
   "rules": {
     "cyan": {
-      "meaning": "Attivo, in corso o protetto. Nient'altro.",
+      "meaning": "Active, ongoing, or protected. Nothing else.",
       "allowedFor": [
-        "timer o processo in corso",
-        "indicatore di cifratura o protezione (badge, lucchetto)",
-        "barra o etichetta di robustezza",
-        "stato attivo di una funzione"
+        "ongoing timer or process",
+        "encryption or protection indicator (badge, lock)",
+        "strength bar or label",
+        "active state of a feature"
       ],
       "forbiddenFor": [
-        "pulsanti principali (usano action.primary, il blu)",
-        "link, titoli, bordi generici, icone decorative",
-        "errori o avvisi (usano feedback.danger e accent.symbol)"
+        "primary buttons (they use action.primary, the blue)",
+        "links, titles, generic borders, decorative icons",
+        "errors or warnings (they use feedback.danger and accent.symbol)"
       ],
       "maxElementsPerScreen": 2,
       "requireTextOrIconAlongside": true,
-      "test": "Se tolgo il ciano, l'utente perde un'informazione di stato? Se no, l'elemento non va in ciano."
+      "test": "If cyan is removed, does the user lose state information? If no, the element should not be cyan."
+    },
+    "amber": {
+      "meaning": "Symbols and operators in text.",
+      "allowedFor": [
+        "symbols in passwords (generator)",
+        "operators and functions in calculator expression"
+      ],
+      "forbiddenFor": [
+        "lines, dividers, and borders",
+        "buttons",
+        "backgrounds"
+      ],
+      "note": "In light theme, use amber.700 (#A35405): contrast 5.07:1 on #F4F6F9."
     },
     "accessibility": {
       "minContrastNormalText": 4.5,
       "minContrastLargeTextAndUi": 3,
-      "note": "I rapporti di contrasto del tema chiaro sono stati calcolati a mano e vanno verificati con un checker prima del rilascio.",
+      "note": "Light theme contrast ratios were calculated manually and must be verified with a checker before release.",
       "neverRelyOnColorAlone": true
     }
   }
