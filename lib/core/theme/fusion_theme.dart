@@ -51,11 +51,12 @@ class FusionTheme {
           '$semanticPrefix.action.onPrimary',
         ),
         secondary: primary,
-        onSecondary: Colors.white,
-        error: Colors.red,
-        onError: Colors.white,
+        onSecondary: tokens.color('$semanticPrefix.action.onPrimary'),
+        error: tokens.color('$semanticPrefix.feedback.danger'),
+        onError: tokens.color('$semanticPrefix.action.onPrimary'),
         surface: surface,
         onSurface: text,
+        onSurfaceVariant: tokens.color('$semanticPrefix.textSecondary'),
       ),
       textTheme: const TextTheme(
         titleLarge: TextStyle(
