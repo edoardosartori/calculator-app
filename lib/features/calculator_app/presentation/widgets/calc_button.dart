@@ -64,6 +64,9 @@ class _CalcButtonState extends State<CalcButton> {
           border = null;
           break;
       }
+      if (widget.label == ')') {
+        textColor = fusionTheme?.characterSymbol ?? theme.colorScheme.tertiary;
+      }
     }
 
     return Semantics(
