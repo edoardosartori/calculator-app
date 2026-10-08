@@ -23,7 +23,7 @@ class DisplayPanel extends StatelessWidget {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Risultato copiato negli appunti'),
+        content: Text('Result copied to clipboard'),
         duration: Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),

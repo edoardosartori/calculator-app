@@ -33,7 +33,7 @@ class Evaluator {
         '-' || '−' => left - right,
         '*' || '×' => left * right,
         '/' || '÷' => right == 0
-            ? throw UnsupportedError('Divisione per azzeramento non valida')
+            ? throw UnsupportedError('Division by zero is not allowed')
             : left / right,
         '%' => left % right,
         '^' => math.pow(left, right).toDouble(),
@@ -61,19 +61,19 @@ class Evaluator {
       case 'tan':
         final double cosVal = math.cos(radArg);
         if (cosVal.abs() < 1e-15) {
-          throw UnsupportedError('Dominio non valido');
+          throw UnsupportedError('Invalid domain');
         }
         return _cleanTrigResult(math.tan(radArg), arg, angleUnit, false);
       case 'asin':
       case 'asin⁻¹':
       case 'sin⁻¹':
-        if (arg < -1 || arg > 1) throw UnsupportedError('Dominio non valido');
+        if (arg < -1 || arg > 1) throw UnsupportedError('Invalid domain');
         final double res = math.asin(arg);
         return angleUnit == AngleUnit.deg ? res * (180.0 / math.pi) : res;
       case 'acos':
       case 'acos⁻¹':
       case 'cos⁻¹':
-        if (arg < -1 || arg > 1) throw UnsupportedError('Dominio non valido');
+        if (arg < -1 || arg > 1) throw UnsupportedError('Invalid domain');
         final double res = math.acos(arg);
         return angleUnit == AngleUnit.deg ? res * (180.0 / math.pi) : res;
       case 'atan':
@@ -82,14 +82,14 @@ class Evaluator {
         final double res = math.atan(arg);
         return angleUnit == AngleUnit.deg ? res * (180.0 / math.pi) : res;
       case 'ln':
-        if (arg <= 0) throw UnsupportedError('Dominio non valido');
+        if (arg <= 0) throw UnsupportedError('Invalid domain');
         return math.log(arg);
       case 'log':
-        if (arg <= 0) throw UnsupportedError('Dominio non valido');
+        if (arg <= 0) throw UnsupportedError('Invalid domain');
         return math.log(arg) / math.ln10;
       case 'sqrt':
       case '√':
-        if (arg < 0) throw UnsupportedError('Dominio non valido');
+        if (arg < 0) throw UnsupportedError('Invalid domain');
         return math.sqrt(arg);
       case 'abs':
         return arg.abs();
@@ -121,7 +121,7 @@ class Evaluator {
 
   static double _factorial(double n) {
     if (n < 0 || n != n.truncateToDouble() || n > 170) {
-      throw UnsupportedError('Fattoriale non valido');
+      throw UnsupportedError('Invalid factorial');
     }
     int intN = n.toInt();
     double result = 1.0;
@@ -133,7 +133,7 @@ class Evaluator {
 
   static String formatResult(double value) {
     if (value.isNaN || value.isInfinite) {
-      return 'Errore';
+      return 'Error';
     }
 
     if (value == 0.0) return '0';
