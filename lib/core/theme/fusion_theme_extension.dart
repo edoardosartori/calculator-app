@@ -6,9 +6,9 @@ class FusionThemeExtension extends ThemeExtension<FusionThemeExtension> {
   final Color stateOnActive;
   final Color stateActiveTint;
 
-  final Color passwordLetter;
-  final Color passwordDigit;
-  final Color passwordSymbol;
+  final Color characterLetter;
+  final Color characterDigit;
+  final Color characterSymbol;
 
   final Color success;
   final Color danger;
@@ -21,9 +21,9 @@ class FusionThemeExtension extends ThemeExtension<FusionThemeExtension> {
     required this.stateActive,
     required this.stateOnActive,
     required this.stateActiveTint,
-    required this.passwordLetter,
-    required this.passwordDigit,
-    required this.passwordSymbol,
+    required this.characterLetter,
+    required this.characterDigit,
+    required this.characterSymbol,
     required this.success,
     required this.danger,
     required this.border,
@@ -36,9 +36,9 @@ class FusionThemeExtension extends ThemeExtension<FusionThemeExtension> {
     Color? stateActive,
     Color? stateOnActive,
     Color? stateActiveTint,
-    Color? passwordLetter,
-    Color? passwordDigit,
-    Color? passwordSymbol,
+    Color? characterLetter,
+    Color? characterDigit,
+    Color? characterSymbol,
     Color? success,
     Color? danger,
     Color? border,
@@ -49,9 +49,9 @@ class FusionThemeExtension extends ThemeExtension<FusionThemeExtension> {
       stateActive: stateActive ?? this.stateActive,
       stateOnActive: stateOnActive ?? this.stateOnActive,
       stateActiveTint: stateActiveTint ?? this.stateActiveTint,
-      passwordLetter: passwordLetter ?? this.passwordLetter,
-      passwordDigit: passwordDigit ?? this.passwordDigit,
-      passwordSymbol: passwordSymbol ?? this.passwordSymbol,
+      characterLetter: characterLetter ?? this.characterLetter,
+      characterDigit: characterDigit ?? this.characterDigit,
+      characterSymbol: characterSymbol ?? this.characterSymbol,
       success: success ?? this.success,
       danger: danger ?? this.danger,
       border: border ?? this.border,
@@ -73,9 +73,9 @@ class FusionThemeExtension extends ThemeExtension<FusionThemeExtension> {
       stateActive: Color.lerp(stateActive, other.stateActive, t)!,
       stateOnActive: Color.lerp(stateOnActive, other.stateOnActive, t)!,
       stateActiveTint: Color.lerp(stateActiveTint, other.stateActiveTint, t)!,
-      passwordLetter: Color.lerp(passwordLetter, other.passwordLetter, t)!,
-      passwordDigit: Color.lerp(passwordDigit, other.passwordDigit, t)!,
-      passwordSymbol: Color.lerp(passwordSymbol, other.passwordSymbol, t)!,
+      characterLetter: Color.lerp(characterLetter, other.characterLetter, t)!,
+      characterDigit: Color.lerp(characterDigit, other.characterDigit, t)!,
+      characterSymbol: Color.lerp(characterSymbol, other.characterSymbol, t)!,
       success: Color.lerp(success, other.success, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
       border: Color.lerp(border, other.border, t)!,

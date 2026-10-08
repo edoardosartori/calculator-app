@@ -40,7 +40,7 @@ class DisplayPanel extends StatelessWidget {
     final Color cyanColor =
         fusionTheme?.stateActive ?? theme.colorScheme.primary;
     final Color amberColor =
-        fusionTheme?.passwordSymbol ?? theme.colorScheme.tertiary;
+        fusionTheme?.characterSymbol ?? theme.colorScheme.tertiary;
     final Color dangerColor = fusionTheme?.danger ?? theme.colorScheme.error;
     final Color borderColor = fusionTheme?.border ?? theme.colorScheme.outline;
 

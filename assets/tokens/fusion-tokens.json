@@ -2,7 +2,7 @@
   "$description": "Design tokens of the Fusion style (Carbon Slate base with cyan accent for state and security). DTCG-inspired format: \"$value\" and \"$type\"; references use the {token.path.format}.",
   "meta": {
     "name": "Fusion",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "status": "draft derived from static mockups, to be validated on a real device",
     "units": {
       "dimension": "dp",
@@ -177,7 +177,7 @@
         "danger": { "$value": "{primitive.color.red.400}" },
         "success": { "$value": "{primitive.color.green.400}" }
       },
-      "password": {
+      "character": {
         "letter": { "$value": "{primitive.color.slate.100}" },
         "digit": { "$value": "{primitive.color.blue.500}" },
         "symbol": { "$value": "{primitive.color.amber.400}" }
@@ -213,7 +213,7 @@
         "danger": { "$value": "{primitive.color.red.600}" },
         "success": { "$value": "{primitive.color.green.700}" }
       },
-      "password": {
+      "character": {
         "letter": { "$value": "{primitive.color.paper.950}" },
         "digit": { "$value": "{primitive.color.blue.700}" },
         "symbol": { "$value": "{primitive.color.amber.700}" }
@@ -282,7 +282,7 @@
       "allowedFor": [
         "ongoing timer or process",
         "encryption or protection indicator (badge, lock)",
-        "strength bar or label",
+        "progress or level indicator (bar or label)",
         "active state of a feature"
       ],
       "forbiddenFor": [
@@ -296,10 +296,7 @@
     },
     "amber": {
       "meaning": "Symbols and operators in text.",
-      "allowedFor": [
-        "symbols in passwords (generator)",
-        "operators and functions in calculator expression"
-      ],
+      "allowedFor": ["symbols and operators in text or expressions"],
       "forbiddenFor": [
         "lines, dividers, and borders",
         "buttons",
