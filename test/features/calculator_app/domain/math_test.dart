@@ -3,6 +3,8 @@ import 'package:calc_app/features/calculator_app/domain/tokenizer.dart';
 import 'package:calc_app/features/calculator_app/domain/parser.dart';
 import 'package:calc_app/features/calculator_app/domain/evaluator.dart';
 
+import 'dart:math' as math;
+
 double _eval(String expression, {AngleUnit angleUnit = AngleUnit.deg}) {
   final tokens = Tokenizer.tokenize(expression);
   final ast = Parser(tokens).parse();
@@ -10,6 +12,41 @@ double _eval(String expression, {AngleUnit angleUnit = AngleUnit.deg}) {
 }
 
 void main() {
+  group('Inverse Trigonometric Functions', () {
+    test('sin⁻¹ is tokenized as the inverse function, not as sin', () {
+      final tokens = Tokenizer.tokenize('sin⁻¹(0.5)');
+      expect(
+        tokens.map((t) => t.value).toList(),
+        ['sin⁻¹', '(', '0.5', ')'],
+      );
+    });
+
+    test('asin is a single function token', () {
+      final tokens = Tokenizer.tokenize('asin(0.5)');
+      expect(tokens.first.value, 'asin');
+    });
+
+    test('evaluates inverse functions in DEG', () {
+      expect(_eval('sin⁻¹(0.5)', angleUnit: AngleUnit.deg), closeTo(30, 1e-9));
+      expect(_eval('cos⁻¹(0.5)', angleUnit: AngleUnit.deg), closeTo(60, 1e-9));
+      expect(_eval('tan⁻¹(1)', angleUnit: AngleUnit.deg), closeTo(45, 1e-9));
+    });
+
+    test('evaluates inverse functions in RAD', () {
+      expect(
+        _eval('sin⁻¹(0.5)', angleUnit: AngleUnit.rad),
+        closeTo(math.pi / 6, 1e-10),
+      );
+    });
+  });
+
+  group('Conventions', () {
+    test('percent operator is modulo', () {
+      // Documents the current convention: '%' is the modulo operator.
+      expect(_eval('10 % 3'), equals(1));
+    });
+  });
+
   group('Tokenizer & Implicit Multiplication', () {
     test('inserts implicit multiplication between number and constant/paren',
         () {
