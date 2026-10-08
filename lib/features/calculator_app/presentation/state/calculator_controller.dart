@@ -19,6 +19,48 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
   final SharedPreferences _preferences;
   static const String _angleUnitKey = 'angle_unit';
 
+  /// Key labels shown for each function that opens a parenthesis.
+  static const Map<String, String> _functionKeyLabels = {
+    'sin⁻¹': 'sin⁻¹',
+    'cos⁻¹': 'cos⁻¹',
+    'tan⁻¹': 'tan⁻¹',
+    'asin⁻¹': 'asin⁻¹',
+    'acos⁻¹': 'acos⁻¹',
+    'atan⁻¹': 'atan⁻¹',
+    'asin': 'asin',
+    'acos': 'acos',
+    'atan': 'atan',
+    'sin': 'sin',
+    'cos': 'cos',
+    'tan': 'tan',
+    'ln': 'ln',
+    'log': 'log',
+    'sqrt': 'sqrt',
+    'abs': '|x|',
+    '√': '√',
+  };
+
+  /// Function names, longest first so that 'sin⁻¹' is matched before 'sin'.
+  static const List<String> _functionNames = [
+    'asin⁻¹',
+    'acos⁻¹',
+    'atan⁻¹',
+    'sin⁻¹',
+    'cos⁻¹',
+    'tan⁻¹',
+    'asin',
+    'acos',
+    'atan',
+    'sin',
+    'cos',
+    'tan',
+    'ln',
+    'log',
+    'sqrt',
+    'abs',
+    '√',
+  ];
+
   static AngleUnit _loadAngleUnit(SharedPreferences prefs) {
     final String? saved = prefs.getString(_angleUnitKey);
     return saved == 'rad' ? AngleUnit.rad : AngleUnit.deg;
@@ -37,45 +79,212 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
   }
 
   void appendToken(String token) {
-    final String newExpression = value.expression + token;
-    value = value.copyWith(expression: newExpression, clearError: true);
-    _evaluateCurrentExpression();
+    final String newExpression = value.isResultConfirmed
+        ? _startFromResult(token)
+        : _appendToEditing(token);
+
+    if (newExpression == value.expression) {
+      // Nothing to add (e.g. ')' with no parenthesis to close).
+      return;
+    }
+
+    _updateExpression(newExpression);
   }
 
   void clear() {
-    value = value.copyWith(expression: '', result: '0', clearError: true);
+    value = value.copyWith(
+      expression: '',
+      result: '0',
+      clearError: true,
+      isResultConfirmed: false,
+      openParenKey: null,
+    );
   }
 
   void deleteLastChar() {
-    if (value.expression.isNotEmpty) {
-      final String newExpression =
-          value.expression.substring(0, value.expression.length - 1);
-      value = value.copyWith(expression: newExpression, clearError: true);
-      _evaluateCurrentExpression();
-    }
+    if (value.expression.isEmpty) return;
+
+    _updateExpression(
+      value.expression.substring(0, value.expression.length - 1),
+    );
   }
 
   void evaluate() {
     if (value.expression.isEmpty) return;
 
+    // Safety net: close any missing ')' before evaluating.
+    final String closed = _closeParens(value.expression);
+
     try {
-      final tokens = Tokenizer.tokenize(value.expression);
+      final tokens = Tokenizer.tokenize(closed);
       final ast = Parser(tokens).parse();
       final double evalResult = Evaluator.evaluate(ast, value.angleUnit);
       final String formatted = Evaluator.formatResult(evalResult);
 
       value = value.copyWith(
+        expression: closed,
         result: formatted,
         clearError: true,
+        isResultConfirmed: true,
+        openParenKey: null,
       );
     } on UnsupportedError catch (e) {
-      value = value.copyWith(errorMessage: e.message ?? 'Errore');
+      value = value.copyWith(
+        errorMessage: e.message?.toString() ?? 'Error',
+      );
     } on FormatException {
-      value = value.copyWith(errorMessage: 'Espressione non valida');
+      value = value.copyWith(errorMessage: 'Invalid expression');
     } catch (_) {
-      value = value.copyWith(errorMessage: 'Errore');
+      value = value.copyWith(errorMessage: 'Error');
     }
   }
+
+  // ---------------------------------------------------------------------
+  // Input handling
+  // ---------------------------------------------------------------------
+
+  /// Builds the new expression when '=' has just confirmed a result.
+  String _startFromResult(String token) {
+    if (token == ')') {
+      // After a confirmed result all parentheses are closed.
+      return value.expression;
+    }
+
+    if (!_resultIsUsable) {
+      // After an error every input starts a new calculation.
+      return token;
+    }
+
+    if (token == '1/' || token == 'e^') {
+      return '$token($_expandedResult)';
+    }
+
+    if (token == '.') {
+      return '0.';
+    }
+
+    final bool isDigit = token.length == 1 &&
+        token.compareTo('0') >= 0 &&
+        token.compareTo('9') <= 0;
+    final bool isConstant = token == 'π' || token == 'e';
+    final bool isOpener = token.endsWith('(');
+
+    if (isDigit || isConstant || isOpener) {
+      return token;
+    }
+
+    // Binary operators, '!' and '^2' continue from the result.
+    return '$_expandedResult$token';
+  }
+
+  /// Builds the new expression while the user is still editing.
+  String _appendToEditing(String token) {
+    final String expression = value.expression;
+
+    if (token == '1/' || token == 'e^') {
+      // Wrap the whole current expression.
+      final String inner = _closeParens(expression);
+      return inner.isEmpty ? '$token(' : '$token($inner)';
+    }
+
+    if (token == ')' && _openParenCount(expression) <= 0) {
+      return expression;
+    }
+
+    return '$expression$token';
+  }
+
+  void _updateExpression(String expression) {
+    value = value.copyWith(
+      expression: expression,
+      clearError: true,
+      isResultConfirmed: false,
+      openParenKey: _deriveOpenParenKey(expression),
+    );
+    _evaluateCurrentExpression();
+  }
+
+  bool get _resultIsUsable =>
+      value.errorMessage == null &&
+      value.result.isNotEmpty &&
+      value.result != 'Error';
+
+  /// Results in scientific notation (e.g. '1e+12') cannot be tokenized
+  /// back as plain numbers, so expand them to a full decimal string.
+  String get _expandedResult {
+    final String result = value.result;
+    if (!result.contains('e')) return result;
+
+    final double? parsed = double.tryParse(result);
+    if (parsed == null) return result;
+
+    return parsed.abs() < 1.0
+        ? parsed.toStringAsFixed(15)
+        : parsed.toStringAsFixed(0);
+  }
+
+  // ---------------------------------------------------------------------
+  // Parentheses helpers
+  // ---------------------------------------------------------------------
+
+  static int _openParenCount(String expression) {
+    int count = 0;
+    for (int i = 0; i < expression.length; i++) {
+      if (expression[i] == '(') count++;
+      if (expression[i] == ')') count--;
+    }
+    return count;
+  }
+
+  static String _closeParens(String expression) {
+    final int unclosed = _openParenCount(expression);
+    if (unclosed <= 0) return expression;
+    return '$expression${')' * unclosed}';
+  }
+
+  /// Returns the key label whose parenthesis is the innermost still-open
+  /// function parenthesis, or null. Derived from the expression only, so
+  /// it stays consistent after deletions too.
+  static String? _deriveOpenParenKey(String expression) {
+    final List<String?> stack = [];
+    int i = 0;
+
+    while (i < expression.length) {
+      final String char = expression[i];
+
+      if (char == '(') {
+        final String prefix = expression.substring(0, i);
+        String? label;
+        for (final String name in _functionNames) {
+          if (prefix.endsWith(name)) {
+            label = _functionKeyLabels[name];
+            break;
+          }
+        }
+        stack.add(label);
+        i++;
+        continue;
+      }
+
+      if (char == ')') {
+        if (stack.isNotEmpty) stack.removeLast();
+        i++;
+        continue;
+      }
+
+      i++;
+    }
+
+    for (int j = stack.length - 1; j >= 0; j--) {
+      final String? label = stack[j];
+      if (label != null) return label;
+    }
+    return null;
+  }
+
+  // ---------------------------------------------------------------------
+  // Live preview
+  // ---------------------------------------------------------------------
 
   void _evaluateCurrentExpression() {
     if (value.expression.trim().isEmpty) {
@@ -84,14 +293,15 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
     }
 
     try {
-      final tokens = Tokenizer.tokenize(value.expression);
+      final String closed = _closeParens(value.expression);
+      final tokens = Tokenizer.tokenize(closed);
       final ast = Parser(tokens).parse();
       final double evalResult = Evaluator.evaluate(ast, value.angleUnit);
       final String formatted = Evaluator.formatResult(evalResult);
 
       value = value.copyWith(result: formatted, clearError: true);
     } catch (_) {
-      // Keep previous result or wait for expression completion
+      // Keep the previous result while the expression is incomplete.
     }
   }
 }

@@ -31,25 +31,26 @@ class Tokenizer {
     '!'
   };
 
-  static const Set<String> _functions = {
+  // Longest names first: 'sin⁻¹' must be matched before 'sin'.
+  static const List<String> _functions = [
+    'asin⁻¹',
+    'acos⁻¹',
+    'atan⁻¹',
+    'sin⁻¹',
+    'cos⁻¹',
+    'tan⁻¹',
+    'asin',
+    'acos',
+    'atan',
     'sin',
     'cos',
     'tan',
-    'asin',
-    'asin⁻¹',
-    'sin⁻¹',
-    'acos',
-    'acos⁻¹',
-    'cos⁻¹',
-    'atan',
-    'atan⁻¹',
-    'tan⁻¹',
     'ln',
     'log',
     'sqrt',
     '√',
-    'abs'
-  };
+    'abs',
+  ];
 
   static List<Token> tokenize(String input) {
     final List<Token> tokens = [];

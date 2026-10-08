@@ -59,6 +59,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         isOpen: state.isScientificOpen,
                         onToggle: widget.controller.toggleScientificPanel,
                         onToken: widget.controller.appendToken,
+                        openParenKey: state.openParenKey,
                       ),
                       const SizedBox(height: 6),
                       BasicKeyboard(
@@ -66,6 +67,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         onClear: widget.controller.clear,
                         onDelete: widget.controller.deleteLastChar,
                         onEvaluate: widget.controller.evaluate,
+                        openParenKey: state.openParenKey,
                       ),
                     ],
                   ),

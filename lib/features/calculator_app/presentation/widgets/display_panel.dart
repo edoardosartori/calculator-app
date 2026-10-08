@@ -92,9 +92,9 @@ class DisplayPanel extends StatelessWidget {
                 const SizedBox(height: 8),
                 GestureDetector(
                   onLongPress: () => _copyToClipboard(context),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    reverse: true,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
                     child: Semantics(
                       label: errorMessage ?? 'Result: $result',
                       child: Text(

@@ -9,6 +9,7 @@ class BasicKeyboard extends StatelessWidget {
     required this.onClear,
     required this.onDelete,
     required this.onEvaluate,
+    required this.openParenKey,
   });
 
   final ValueChanged<String> onToken;
@@ -16,8 +17,13 @@ class BasicKeyboard extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onEvaluate;
 
+  /// Label of the morphing key that currently shows ')', or null.
+  final String? openParenKey;
+
   @override
   Widget build(BuildContext context) {
+    final bool sqrtIsMorphed = openParenKey == '√';
+
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -29,8 +35,8 @@ class BasicKeyboard extends StatelessWidget {
         // Row 1
         CalcButton(label: 'C', onTap: onClear, category: ButtonCategory.action),
         CalcButton(
-            label: '√',
-            onTap: () => onToken('√('),
+            label: sqrtIsMorphed ? ')' : '√',
+            onTap: () => onToken(sqrtIsMorphed ? ')' : '√('),
             category: ButtonCategory.action),
         CalcButton(
             label: '%',
