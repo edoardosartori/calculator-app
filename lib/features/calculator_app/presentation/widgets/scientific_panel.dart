@@ -4,40 +4,60 @@ import '../../../../core/theme/fusion_motion.dart';
 import '../../../../core/theme/fusion_theme_extension.dart';
 import 'calc_button.dart';
 
-class ScientificPanel extends StatelessWidget {
-  const ScientificPanel({
+/// Key label -> token appended to the expression.
+/// Insertion order is the phone order (5 columns).
+const Map<String, String> _scientificKeyTokens = {
+  'sin': 'sin(',
+  'cos': 'cos(',
+  'tan': 'tan(',
+  'ln': 'ln(',
+  'log': 'log(',
+  'sin⁻¹': 'sin⁻¹(',
+  'cos⁻¹': 'cos⁻¹(',
+  'tan⁻¹': 'tan⁻¹(',
+  'x²': '^2',
+  'xʸ': '^',
+  '1/x': '1/',
+  'n!': '!',
+  '|x|': 'abs(',
+  'π': 'π',
+  'eˣ': 'e^',
+};
+
+/// Tablet order: 3 columns x 5 rows. Same keys and tokens as the phone.
+const List<List<String>> _tabletKeyRows = [
+  ['sin', 'cos', 'tan'],
+  ['sin⁻¹', 'cos⁻¹', 'tan⁻¹'],
+  ['ln', 'log', 'x²'],
+  ['xʸ', '1/x', 'n!'],
+  ['|x|', 'π', 'eˣ'],
+];
+
+Widget _buildScientificKey({
+  required String label,
+  required String? openParenKey,
+  required ValueChanged<String> onToken,
+}) {
+  final bool isMorphed = openParenKey == label;
+
+  return CalcButton(
+    label: isMorphed ? ')' : label,
+    onTap: () => onToken(isMorphed ? ')' : _scientificKeyTokens[label]!),
+    category: ButtonCategory.action,
+  );
+}
+
+/// Drag handle + "fx" label that opens and closes the scientific keys.
+/// Takes the full width it is given.
+class ScientificToggle extends StatelessWidget {
+  const ScientificToggle({
     super.key,
-    required this.onToken,
     required this.isOpen,
     required this.onToggle,
-    required this.openParenKey,
   });
 
-  final ValueChanged<String> onToken;
   final bool isOpen;
   final VoidCallback onToggle;
-
-  /// Label of the key that currently shows ')' because its parenthesis
-  /// is still open (morphing key). Null when all parentheses are closed.
-  final String? openParenKey;
-
-  static const Map<String, String> _keyTokens = {
-    'sin': 'sin(',
-    'cos': 'cos(',
-    'tan': 'tan(',
-    'ln': 'ln(',
-    'log': 'log(',
-    'sin⁻¹': 'sin⁻¹(',
-    'cos⁻¹': 'cos⁻¹(',
-    'tan⁻¹': 'tan⁻¹(',
-    'x²': '^2',
-    'xʸ': '^',
-    '1/x': '1/',
-    'n!': '!',
-    '|x|': 'abs(',
-    'π': 'π',
-    'eˣ': 'e^',
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +104,35 @@ class ScientificPanel extends StatelessWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// Phone layout: toggle on top, 5-column grid below when open.
+class ScientificPanel extends StatelessWidget {
+  const ScientificPanel({
+    super.key,
+    required this.onToken,
+    required this.isOpen,
+    required this.onToggle,
+    required this.openParenKey,
+  });
+
+  final ValueChanged<String> onToken;
+  final bool isOpen;
+  final VoidCallback onToggle;
+
+  /// Label of the key that currently shows ')' because its parenthesis
+  /// is still open (morphing key). Null when all parentheses are closed.
+  final String? openParenKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ScientificToggle(isOpen: isOpen, onToggle: onToggle),
         if (isOpen)
           AnimatedContainer(
             duration: FusionMotion.normal,
@@ -96,21 +145,65 @@ class ScientificPanel extends StatelessWidget {
               crossAxisSpacing: 6,
               childAspectRatio: 1.3,
               children: [
-                for (final String label in _keyTokens.keys) _buildKey(label),
+                for (final String label in _scientificKeyTokens.keys)
+                  _buildScientificKey(
+                    label: label,
+                    openParenKey: openParenKey,
+                    onToken: onToken,
+                  ),
               ],
             ),
           ),
       ],
     );
   }
+}
 
-  Widget _buildKey(String label) {
-    final bool isMorphed = openParenKey == label;
+/// Tablet layout: 3 columns x 5 rows that fill the height it is given.
+class ScientificKeypad extends StatelessWidget {
+  const ScientificKeypad({
+    super.key,
+    required this.onToken,
+    required this.openParenKey,
+  });
 
-    return CalcButton(
-      label: isMorphed ? ')' : label,
-      onTap: () => onToken(isMorphed ? ')' : _keyTokens[label]!),
-      category: ButtonCategory.action,
+  final ValueChanged<String> onToken;
+  final String? openParenKey;
+
+  static const double _gap = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    assert(
+      _tabletKeyRows
+          .expand((row) => row)
+          .every(_scientificKeyTokens.containsKey),
+      'Every tablet key must exist in _scientificKeyTokens',
+    );
+
+    return Column(
+      children: [
+        for (int r = 0; r < _tabletKeyRows.length; r++) ...[
+          if (r > 0) const SizedBox(height: _gap),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (int c = 0; c < _tabletKeyRows[r].length; c++) ...[
+                  if (c > 0) const SizedBox(width: _gap),
+                  Expanded(
+                    child: _buildScientificKey(
+                      label: _tabletKeyRows[r][c],
+                      openParenKey: openParenKey,
+                      onToken: onToken,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

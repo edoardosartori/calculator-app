@@ -10,6 +10,7 @@ class BasicKeyboard extends StatelessWidget {
     required this.onDelete,
     required this.onEvaluate,
     required this.openParenKey,
+    this.expandToFill = false,
   });
 
   final ValueChanged<String> onToken;
@@ -20,67 +21,96 @@ class BasicKeyboard extends StatelessWidget {
   /// Label of the morphing key that currently shows ')', or null.
   final String? openParenKey;
 
+  /// Tablet: keys fill the available height instead of using a fixed
+  /// aspect ratio. The phone layout keeps the default (false).
+  final bool expandToFill;
+
   @override
   Widget build(BuildContext context) {
     final bool sqrtIsMorphed = openParenKey == '√';
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      childAspectRatio: 1.15,
+    final List<Widget> keys = [
+      // Row 1
+      CalcButton(label: 'C', onTap: onClear, category: ButtonCategory.action),
+      CalcButton(
+          label: sqrtIsMorphed ? ')' : '√',
+          onTap: () => onToken(sqrtIsMorphed ? ')' : '√('),
+          category: ButtonCategory.action),
+      CalcButton(
+          label: '%',
+          onTap: () => onToken('%'),
+          category: ButtonCategory.action),
+      CalcButton(
+          label: '÷',
+          onTap: () => onToken('÷'),
+          category: ButtonCategory.operator),
+
+      // Row 2
+      CalcButton(label: '7', onTap: () => onToken('7')),
+      CalcButton(label: '8', onTap: () => onToken('8')),
+      CalcButton(label: '9', onTap: () => onToken('9')),
+      CalcButton(
+          label: '×',
+          onTap: () => onToken('×'),
+          category: ButtonCategory.operator),
+
+      // Row 3
+      CalcButton(label: '4', onTap: () => onToken('4')),
+      CalcButton(label: '5', onTap: () => onToken('5')),
+      CalcButton(label: '6', onTap: () => onToken('6')),
+      CalcButton(
+          label: '−',
+          onTap: () => onToken('−'),
+          category: ButtonCategory.operator),
+
+      // Row 4
+      CalcButton(label: '1', onTap: () => onToken('1')),
+      CalcButton(label: '2', onTap: () => onToken('2')),
+      CalcButton(label: '3', onTap: () => onToken('3')),
+      CalcButton(
+          label: '+',
+          onTap: () => onToken('+'),
+          category: ButtonCategory.operator),
+
+      // Row 5
+      CalcButton(label: '⌫', onTap: onDelete, category: ButtonCategory.action),
+      CalcButton(label: '0', onTap: () => onToken('0')),
+      CalcButton(label: '.', onTap: () => onToken('.')),
+      CalcButton(
+          label: '=', onTap: onEvaluate, category: ButtonCategory.active),
+    ];
+
+    if (!expandToFill) {
+      return GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 4,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1.15,
+        children: keys,
+      );
+    }
+
+    const int columns = 4;
+    const double gap = 8;
+
+    return Column(
       children: [
-        // Row 1
-        CalcButton(label: 'C', onTap: onClear, category: ButtonCategory.action),
-        CalcButton(
-            label: sqrtIsMorphed ? ')' : '√',
-            onTap: () => onToken(sqrtIsMorphed ? ')' : '√('),
-            category: ButtonCategory.action),
-        CalcButton(
-            label: '%',
-            onTap: () => onToken('%'),
-            category: ButtonCategory.action),
-        CalcButton(
-            label: '÷',
-            onTap: () => onToken('÷'),
-            category: ButtonCategory.operator),
-
-        // Row 2
-        CalcButton(label: '7', onTap: () => onToken('7')),
-        CalcButton(label: '8', onTap: () => onToken('8')),
-        CalcButton(label: '9', onTap: () => onToken('9')),
-        CalcButton(
-            label: '×',
-            onTap: () => onToken('×'),
-            category: ButtonCategory.operator),
-
-        // Row 3
-        CalcButton(label: '4', onTap: () => onToken('4')),
-        CalcButton(label: '5', onTap: () => onToken('5')),
-        CalcButton(label: '6', onTap: () => onToken('6')),
-        CalcButton(
-            label: '−',
-            onTap: () => onToken('−'),
-            category: ButtonCategory.operator),
-
-        // Row 4
-        CalcButton(label: '1', onTap: () => onToken('1')),
-        CalcButton(label: '2', onTap: () => onToken('2')),
-        CalcButton(label: '3', onTap: () => onToken('3')),
-        CalcButton(
-            label: '+',
-            onTap: () => onToken('+'),
-            category: ButtonCategory.operator),
-
-        // Row 5
-        CalcButton(
-            label: '⌫', onTap: onDelete, category: ButtonCategory.action),
-        CalcButton(label: '0', onTap: () => onToken('0')),
-        CalcButton(label: '.', onTap: () => onToken('.')),
-        CalcButton(
-            label: '=', onTap: onEvaluate, category: ButtonCategory.active),
+        for (int r = 0; r < keys.length ~/ columns; r++) ...[
+          if (r > 0) const SizedBox(height: gap),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (int c = 0; c < columns; c++) ...[
+                  if (c > 0) const SizedBox(width: gap),
+                  Expanded(child: keys[r * columns + c]),
+                ],
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
