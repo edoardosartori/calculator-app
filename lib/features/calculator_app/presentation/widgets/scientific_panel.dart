@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/theme/fusion_motion.dart';
 import '../../../../core/theme/fusion_theme_extension.dart';
@@ -47,17 +48,25 @@ Widget _buildScientificKey({
   );
 }
 
-/// Drag handle + "fx" label that opens and closes the scientific keys.
-/// Takes the full width it is given.
+/// fx toggle: visually identical in every state (handle bar + "fx" label),
+/// but the whole strip acts as a button with a full-size hit target.
+/// Tap toggles; swipe up opens, swipe down closes.
 class ScientificToggle extends StatelessWidget {
   const ScientificToggle({
     super.key,
     required this.isOpen,
     required this.onToggle,
+    this.showLabelWhenOpen = false,
   });
 
   final bool isOpen;
   final VoidCallback onToggle;
+  final bool showLabelWhenOpen;
+
+  void _toggle() {
+    HapticFeedback.selectionClick();
+    onToggle();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,50 +75,58 @@ class ScientificToggle extends StatelessWidget {
     final Color textSecondary = theme.colorScheme.onSurfaceVariant;
     final Color borderColor = fusionTheme?.border ?? theme.colorScheme.outline;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Semantics(
-          button: true,
-          label: 'Toggle scientific keyboard',
-          child: GestureDetector(
-            onTap: onToggle,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: borderColor,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+    final bool showLabel = !isOpen || showLabelWhenOpen;
+
+    return Semantics(
+      button: true,
+      label: 'Toggle scientific keyboard',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: _toggle,
+        onVerticalDragEnd: (DragEndDetails details) {
+          final double velocityY = details.primaryVelocity ?? 0;
+          if (velocityY < -150) {
+            if (!isOpen) _toggle();
+          } else if (velocityY > 150) {
+            if (isOpen) _toggle();
+          }
+        },
+        child: Container(
+          width: double.infinity,
+          constraints: showLabel ? const BoxConstraints(minHeight: 48) : null,
+          padding: EdgeInsets.symmetric(vertical: showLabel ? 6 : 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: borderColor,
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-            ),
+              if (showLabel) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'fx',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textSecondary,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
-        if (!isOpen)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Text(
-              'fx',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: textSecondary,
-              ),
-            ),
-          ),
-      ],
+      ),
     );
   }
 }
 
-/// Phone layout: toggle on top, 5-column grid below when open.
+/// Phone layout: fx toggle on top, 5-column grid below when open.
 class ScientificPanel extends StatelessWidget {
   const ScientificPanel({
     super.key,

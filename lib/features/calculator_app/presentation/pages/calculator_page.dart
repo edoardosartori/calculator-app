@@ -131,6 +131,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
               child: ScientificToggle(
                 isOpen: state.isScientificOpen,
                 onToggle: widget.controller.toggleScientificPanel,
+                showLabelWhenOpen: true,
               ),
             ),
           ),
