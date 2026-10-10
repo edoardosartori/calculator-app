@@ -61,6 +61,12 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
     '√',
   ];
 
+  /// Binary operators as typed by the keyboard ('−' is U+2212, like the key).
+  static const Set<String> _binaryOperators = {'+', '−', '×', '÷', '^'};
+
+  /// Postfix tokens: they only make sense right after an operand.
+  static const Set<String> _postfixTokens = {'%', '!', '^2'};
+
   static AngleUnit _loadAngleUnit(SharedPreferences prefs) {
     final String? saved = prefs.getString(_angleUnitKey);
     return saved == 'rad' ? AngleUnit.rad : AngleUnit.deg;
@@ -84,7 +90,8 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
         : _appendToEditing(token);
 
     if (newExpression == value.expression) {
-      // Nothing to add (e.g. ')' with no parenthesis to close).
+      // Nothing to add (e.g. ')' with no parenthesis to close, or a token
+      // rejected by _isTokenAllowed).
       return;
     }
 
@@ -151,8 +158,9 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
     }
 
     if (!_resultIsUsable) {
-      // After an error every input starts a new calculation.
-      return token;
+      // After an error every input starts a new calculation, subject to the
+      // same checks as an empty expression.
+      return _isTokenAllowed('', token) ? token : value.expression;
     }
 
     if (token == '1/' || token == 'e^') {
@@ -180,6 +188,12 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
   /// Builds the new expression while the user is still editing.
   String _appendToEditing(String token) {
     final String expression = value.expression;
+
+    // Discard clearly invalid input; the key stays tappable but nothing is
+    // added to the expression.
+    if (!_isTokenAllowed(expression, token)) {
+      return expression;
+    }
 
     if (token == '1/' || token == 'e^') {
       // Wrap the whole current expression.
@@ -222,6 +236,57 @@ class CalculatorController extends ValueNotifier<CalculatorState> {
         ? parsed.toStringAsFixed(15)
         : parsed.toStringAsFixed(0);
   }
+
+  // ---------------------------------------------------------------------
+  // Input checks
+  // ---------------------------------------------------------------------
+
+  /// Returns true when [token] may follow [expression]. Only clear-cut
+  /// mistakes are blocked; anything else is left to the parser, which
+  /// reports "Invalid expression" on '='.
+  static bool _isTokenAllowed(String expression, String token) {
+    final String last =
+        expression.isEmpty ? '' : expression[expression.length - 1];
+    final bool atStart = last.isEmpty || last == '(';
+    final bool afterOperator = _binaryOperators.contains(last);
+
+    // Unary minus (negative numbers): blocked only right after '+' or '−'.
+    if (token == '−') {
+      return last != '+' && last != '−';
+    }
+
+    // Other binary operators, postfix tokens and ')' need an operand
+    // right before them.
+    if (_binaryOperators.contains(token) ||
+        _postfixTokens.contains(token) ||
+        token == ')') {
+      return !atStart && !afterOperator;
+    }
+
+    // '1/' and 'e^' wrap the whole expression, which must be complete.
+    if (token == '1/' || token == 'e^') {
+      return expression.isEmpty || !(afterOperator || last == '(');
+    }
+
+    // At most one decimal point per number.
+    if (token == '.') {
+      return !_currentNumber(expression).contains('.');
+    }
+
+    return true;
+  }
+
+  /// The digits and dots at the end of [expression] (the number being typed).
+  static String _currentNumber(String expression) {
+    int start = expression.length;
+    while (start > 0 && _isDigitOrDot(expression[start - 1])) {
+      start--;
+    }
+    return expression.substring(start);
+  }
+
+  static bool _isDigitOrDot(String char) =>
+      char == '.' || (char.compareTo('0') >= 0 && char.compareTo('9') <= 0);
 
   // ---------------------------------------------------------------------
   // Parentheses helpers
