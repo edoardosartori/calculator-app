@@ -5,6 +5,7 @@ import '../../models/calculator_state.dart';
 import '../state/calculator_controller.dart';
 import '../widgets/basic_keyboard.dart';
 import '../widgets/display_panel.dart';
+import '../widgets/keys_fit_layout.dart';
 import '../widgets/scientific_panel.dart';
 import '../widgets/top_bar.dart';
 
@@ -91,27 +92,31 @@ class _CalculatorPageState extends State<CalculatorPage> {
     return Column(
       children: [
         _buildTopBar(state),
-        Expanded(child: _buildDisplay(state)),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ScientificPanel(
-                isOpen: state.isScientificOpen,
-                onToggle: widget.controller.toggleScientificPanel,
-                onToken: widget.controller.appendToken,
-                openParenKey: state.openParenKey,
+        Expanded(
+          child: KeysFitLayout(
+            display: _buildDisplay(state),
+            keys: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ScientificPanel(
+                    isOpen: state.isScientificOpen,
+                    onToggle: widget.controller.toggleScientificPanel,
+                    onToken: widget.controller.appendToken,
+                    openParenKey: state.openParenKey,
+                  ),
+                  const SizedBox(height: 6),
+                  BasicKeyboard(
+                    onToken: widget.controller.appendToken,
+                    onClear: widget.controller.clear,
+                    onDelete: widget.controller.deleteLastChar,
+                    onEvaluate: widget.controller.evaluate,
+                    openParenKey: state.openParenKey,
+                  ),
+                ],
               ),
-              const SizedBox(height: 6),
-              BasicKeyboard(
-                onToken: widget.controller.appendToken,
-                onClear: widget.controller.clear,
-                onDelete: widget.controller.deleteLastChar,
-                onEvaluate: widget.controller.evaluate,
-                openParenKey: state.openParenKey,
-              ),
-            ],
+            ),
           ),
         ),
       ],
