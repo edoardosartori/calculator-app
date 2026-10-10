@@ -1,6 +1,6 @@
-# Calc App - built with Flutter
+# Calculator App - built with Flutter
 
-Calc App is a modern calculator built with Flutter, designed to provide both standard and scientific calculations through a clean, responsive and distraction-free interface.
+Modern calculator built with Flutter, designed to provide both standard and scientific calculations through a clean, responsive and distraction-free interface.
 
 ## Features
 
@@ -17,7 +17,7 @@ Calc App is a modern calculator built with Flutter, designed to provide both sta
 
 ## Privacy
 
-Calc App runs entirely on your device.
+Runs entirely on your device.
 
 No data is sent to a server, uploaded to the cloud or stored remotely. The app does not require an account or an internet connection to perform calculations.
 
