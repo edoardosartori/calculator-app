@@ -86,7 +86,11 @@ class _CalcButtonState extends State<CalcButton> {
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             onTap: () {
-              HapticFeedback.lightImpact();
+              if (widget.category == ButtonCategory.active) {
+                HapticFeedback.mediumImpact();
+              } else {
+                HapticFeedback.lightImpact();
+              }
               widget.onTap();
             },
             onTapDown: (_) => setState(() => _isPressed = true),
