@@ -1,25 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/theme/fusion_motion.dart';
 import '../../../../core/theme/fusion_theme_extension.dart';
 import '../../domain/expression_formatter.dart';
 
-class DisplayPanel extends StatelessWidget {
+class DisplayPanel extends StatefulWidget {
   const DisplayPanel({
     super.key,
     required this.expression,
     required this.result,
     this.errorMessage,
+    required this.isResultConfirmed,
   });
 
   final String expression;
   final String result;
   final String? errorMessage;
 
-  void _copyToClipboard(BuildContext context) {
-    if (result.isEmpty || result == '0') return;
+  /// True while the result has been confirmed with '='; the soft cyan
+  /// background stays visible until the next input clears the state.
+  final bool isResultConfirmed;
 
-    Clipboard.setData(ClipboardData(text: result));
+  @override
+  State<DisplayPanel> createState() => _DisplayPanelState();
+}
+
+class _DisplayPanelState extends State<DisplayPanel> {
+  void _copyToClipboard(BuildContext context) {
+    if (widget.result.isEmpty || widget.result == '0') return;
+
+    Clipboard.setData(ClipboardData(text: widget.result));
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -43,6 +54,8 @@ class DisplayPanel extends StatelessWidget {
         fusionTheme?.characterSymbol ?? theme.colorScheme.tertiary;
     final Color dangerColor = fusionTheme?.danger ?? theme.colorScheme.error;
     final Color borderColor = fusionTheme?.border ?? theme.colorScheme.outline;
+    final Color activeTint = fusionTheme?.stateActiveTint ??
+        theme.colorScheme.primary.withValues(alpha: 0.12);
 
     final TextStyle expressionStyle = TextStyle(
       fontFamily: 'JetBrains Mono',
@@ -82,7 +95,7 @@ class DisplayPanel extends StatelessWidget {
                   reverse: true,
                   child: SelectableText.rich(
                     ExpressionFormatter.buildTextSpan(
-                      expression: expression,
+                      expression: widget.expression,
                       defaultStyle: expressionStyle,
                       amberColor: amberColor,
                     ),
@@ -92,21 +105,36 @@ class DisplayPanel extends StatelessWidget {
                 const SizedBox(height: 8),
                 GestureDetector(
                   onLongPress: () => _copyToClipboard(context),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Semantics(
-                      label: errorMessage ?? 'Result: $result',
-                      child: Text(
-                        errorMessage ?? result,
-                        style: errorMessage != null
-                            ? resultStyle.copyWith(
-                                fontSize: 24,
-                                color: dangerColor,
-                                shadows: null,
-                              )
-                            : resultStyle,
-                        maxLines: 1,
+                  child: AnimatedContainer(
+                    duration: FusionMotion.normal,
+                    curve: FusionMotion.curve,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.isResultConfirmed
+                          ? activeTint
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Semantics(
+                        label:
+                            widget.errorMessage ?? 'Result: ${widget.result}',
+                        child: Text(
+                          widget.errorMessage ?? widget.result,
+                          style: widget.errorMessage != null
+                              ? resultStyle.copyWith(
+                                  fontSize: 24,
+                                  color: dangerColor,
+                                  shadows: null,
+                                )
+                              : resultStyle,
+                          maxLines: 1,
+                        ),
                       ),
                     ),
                   ),

@@ -85,6 +85,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
       expression: state.expression,
       result: state.result,
       errorMessage: state.errorMessage,
+      isResultConfirmed: state.isResultConfirmed,
     );
   }
 
