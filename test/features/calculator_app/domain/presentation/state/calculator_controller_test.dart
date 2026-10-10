@@ -114,10 +114,13 @@ void main() {
     c.appendToken('cos(');
     expect(c.value.openParenKey, 'cos');
 
+    c.appendToken('2');
     c.appendToken(')');
+    expect(c.value.expression, 'tan(cos(2)');
     expect(c.value.openParenKey, 'tan');
 
     c.appendToken(')');
+    expect(c.value.expression, 'tan(cos(2))');
     expect(c.value.openParenKey, isNull);
   });
 
@@ -194,5 +197,62 @@ void main() {
 
     c.appendToken('×');
     expect(c.value.expression, '1000000000000×');
+  });
+
+  group('Input validation', () {
+    test('operator at the start of the expression is ignored', () async {
+      final c = await _controller();
+      c.appendToken('+');
+      expect(c.value.expression, '');
+    });
+
+    test('operator right after another operator is ignored', () async {
+      final c = await _controller();
+      c.appendToken('5');
+      c.appendToken('+');
+      c.appendToken('×');
+      expect(c.value.expression, '5+');
+    });
+
+    test('postfix token without operand is ignored', () async {
+      final c = await _controller();
+      c.appendToken('!');
+      expect(c.value.expression, '');
+    });
+
+    test('closing an empty parenthesis is ignored', () async {
+      final c = await _controller();
+      c.appendToken('sin(');
+      c.appendToken(')');
+      expect(c.value.expression, 'sin(');
+      expect(c.value.openParenKey, 'sin');
+    });
+
+    test('second decimal point in the same number is ignored', () async {
+      final c = await _controller();
+      c.appendToken('3');
+      c.appendToken('.');
+      c.appendToken('1');
+      c.appendToken('.');
+      expect(c.value.expression, '3.1');
+    });
+
+    test('unary minus is allowed at start and after × or ÷', () async {
+      final c = await _controller();
+      c.appendToken('−');
+      c.appendToken('5');
+      c.appendToken('×');
+      c.appendToken('−');
+      c.appendToken('2');
+      expect(c.value.expression, '−5×−2');
+    });
+
+    test('unary minus right after + or − is ignored', () async {
+      final c = await _controller();
+      c.appendToken('5');
+      c.appendToken('−');
+      c.appendToken('−');
+      expect(c.value.expression, '5−');
+    });
   });
 }
