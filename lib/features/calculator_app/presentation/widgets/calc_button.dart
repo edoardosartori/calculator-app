@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/fusion_theme_extension.dart';
 
+import 'package:flutter/services.dart';
+
 enum ButtonCategory { number, operator, action, active }
 
 class CalcButton extends StatefulWidget {
@@ -83,7 +85,10 @@ class _CalcButtonState extends State<CalcButton> {
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
-            onTap: widget.onTap,
+            onTap: () {
+              HapticFeedback.lightImpact();
+              widget.onTap();
+            },
             onTapDown: (_) => setState(() => _isPressed = true),
             onTapUp: (_) => setState(() => _isPressed = false),
             onTapCancel: () => setState(() => _isPressed = false),
