@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/fusion_theme.dart';
 import 'core/theme/fusion_tokens.dart';
 import 'core/theme/token_loader.dart';
-import 'features/calculator_app/presentation/pages/calculator_page.dart';
-import 'features/calculator_app/presentation/state/calculator_controller.dart';
+import 'features/presentation/pages/calculator_page.dart';
+import 'features/presentation/state/calculator_controller.dart';
 
 const String _themeModePreferenceKey = 'theme_mode';
 

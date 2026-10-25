@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:calc_app/features/calculator_app/presentation/state/calculator_controller.dart';
+import 'package:calc_app/features/presentation/state/calculator_controller.dart';
 
 Future<CalculatorController> _controller() async {
   SharedPreferences.setMockInitialValues(<String, Object>{});

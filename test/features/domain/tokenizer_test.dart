@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:calc_app/features/calculator_app/domain/tokenizer.dart';
+import 'package:calc_app/features/domain/tokenizer.dart';
 
 void main() {
   test('sin⁻¹ is tokenized as the inverse function, not sin', () {

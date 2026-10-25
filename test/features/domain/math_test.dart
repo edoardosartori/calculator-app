@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:calc_app/features/calculator_app/domain/tokenizer.dart';
-import 'package:calc_app/features/calculator_app/domain/parser.dart';
-import 'package:calc_app/features/calculator_app/domain/evaluator.dart';
+import 'package:calc_app/features/domain/tokenizer.dart';
+import 'package:calc_app/features/domain/parser.dart';
+import 'package:calc_app/features/domain/evaluator.dart';
 
 import 'dart:math' as math;
 
